@@ -1,0 +1,470 @@
+{
+	"info": {
+		"_postman_id": "9a31bd75-3dbd-48bc-85d4-9662097c9005",
+		"name": "Udacity Capstone Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Daily Diary",
+			"item": [
+				{
+					"name": "Get all todos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/{{subdirectory}}",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"{{region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"{{subdirectory}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create todo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Water flowers\",\n\t\"dueDate\": \"2019-06-11\"\n}"
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/{{subdirectory}}",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"{{region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"{{subdirectory}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update todo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Change the world\",\n\t\"dueDate\": \"2019-12-11\",\n\t\"done\": true\n}"
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/{{subdirectory}}/35dd600f-43c2-4649-903c-615e1586a26f",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"{{region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"{{subdirectory}}",
+								"35dd600f-43c2-4649-903c-615e1586a26f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete todo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/{{subdirectory}}/fe671583-4512-45f6-9475-4265c04362fb",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"{{region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"{{subdirectory}}",
+								"fe671583-4512-45f6-9475-4265c04362fb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get attachment URL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.{{region}}.amazonaws.com/dev/{{subdirectory}}/3836b777-9bc4-4429-9b79-ba4e4f5f91c0/attachment",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"{{region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"{{subdirectory}}",
+								"3836b777-9bc4-4429-9b79-ba4e4f5f91c0",
+								"attachment"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ce2b42d4-8cc5-4f30-a6ed-e7f0f303c3fd",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "efb16c49-3866-4241-97d1-360ad72736d8",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Daily Diary (Local Dev)",
+			"item": [
+				{
+					"name": "Get all diary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer 123",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3050/dev/diaries",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3050",
+							"path": [
+								"dev",
+								"diaries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create diary entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer 123333",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Water flowers\",\n\t\"dueDate\": \"2019-06-11\"\n}"
+						},
+						"url": {
+							"raw": "localhost:3050/dev/diaries",
+							"host": [
+								"localhost"
+							],
+							"port": "3050",
+							"path": [
+								"dev",
+								"diaries"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update diary",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer 123"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Change the world\",\n\t\"dueDate\": \"2019-12-11\",\n\t\"done\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3050/dev/diaries/2489612b-8424-4a01-88c5-02d8031acd49",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3050",
+							"path": [
+								"dev",
+								"diaries",
+								"2489612b-8424-4a01-88c5-02d8031acd49"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete diary",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer 123"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3050/dev/diaries/6aae09b3-388c-4d58-a1b2-d6c1011c15c4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3050",
+							"path": [
+								"dev",
+								"diaries",
+								"6aae09b3-388c-4d58-a1b2-d6c1011c15c4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get attachment URL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer 123",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3050/dev/diaries/6b35b335-7ba7-4b82-ba33-0152a7c6441d/attachment",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3050",
+							"path": [
+								"dev",
+								"diaries",
+								"6b35b335-7ba7-4b82-ba33-0152a7c6441d",
+								"attachment"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ce2b42d4-8cc5-4f30-a6ed-e7f0f303c3fd",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "efb16c49-3866-4241-97d1-360ad72736d8",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2e83c0fe-6650-44d5-a90f-4c27ff720d83",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "977c227e-2df3-42eb-9a48-ec25e2f7eeae",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "84f44c7c-3846-4a16-972e-9002ebd2aec3",
+			"key": "apiId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "3e00439e-7f90-45fb-9766-6ccbfa82f999",
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "3d3f3e90-65be-4bf4-98e9-188dc9e270fa",
+			"key": "region",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "4894d26e-b0cd-4128-a36b-0c0ec55a0165",
+			"key": "subdirectory",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

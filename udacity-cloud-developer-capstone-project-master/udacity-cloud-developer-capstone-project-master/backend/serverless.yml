@@ -1,0 +1,290 @@
+service:
+  name: serverless-diary
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: ${self:service.name}
+        description: Serverless diary application
+
+  # See: https://github.com/dherault/serverless-offline
+  serverless-offline:
+    port: 3003
+
+  # See: https://github.com/99xt/serverless-dynamodb-local
+  dynamodb:
+    # If you only want to use DynamoDB Local in some stages, declare them here
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    # Uncomment only if you already have a DynamoDB running locally
+    # noStart: true
+
+    # See: https://github.com/ar90n/serverless-s3-local
+    s3:
+      port: 8200
+      directory: /tmp
+      noStart: true
+
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-reqvalidator-plugin
+  - serverless-webpack
+  - serverless-aws-documentation
+  - serverless-dynamodb-local
+  - serverless-s3-local
+  - serverless-offline
+
+package:
+  individually: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+  tracing:
+    lambda: true
+    apiGateway: true
+
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'af-south-1'}
+
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    DIARY_TABLE: diary-${self:provider.stage}
+    DIARY_TABLE_IDX: diary-idx-${self:provider.environment.DIARY_TABLE}
+    ATTACHMENTS_S3_BUCKET: serverless-diary-attachments-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
+    JWKS_URL: 'https://dev-hhrq1tik.auth0.com/.well-known/jwks.json'
+    AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - codedeploy:*
+      Resource:
+        - '*'
+
+functions:
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - '*'
+
+  GetDiary:
+    handler: src/lambda/http/getDiarys.handler
+    events:
+      - http:
+          authorizer: Auth
+          cors: true
+          method: get
+          path: diaries
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DIARY_TABLE}/index/${self:provider.environment.DIARY_TABLE_IDX}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - '*'
+
+  CreateDiary:
+    handler: src/lambda/http/createDiary.handler
+    events:
+      - http:
+          authorizer: Auth
+          cors: true
+          method: post
+          path: diaries
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new entry to the diary.
+            description: Create a new entry to the diary.
+            # requestModels:
+            #   'application/json': SaveDiaryRequest
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DIARY_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - '*'
+
+  UpdateDiary:
+    handler: src/lambda/http/updateDiary.handler
+    events:
+      - http:
+          authorizer: Auth
+          cors: true
+          method: patch
+          path: diaries/{diaryId}
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update a diary entry
+            description: Update a diary entry
+            # requestModels:
+            #   'application/json': SaveDiaryRequest
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DIARY_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - '*'
+
+  DeleteDiary:
+    handler: src/lambda/http/deleteDiary.handler
+    events:
+      - http:
+          authorizer: Auth
+          cors: true
+          method: delete
+          path: diaries/{diaryId}
+          documentation:
+            summary: Delete a diary entry.
+            description: Delete a diary entry.
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DIARY_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - '*'
+
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          authorizer: Auth
+          cors: true
+          method: post
+          path: diaries/{diaryId}/attachment
+
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENTS_S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - '*'
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+
+    DiaryDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: diaryId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: diaryId
+            KeyType: RANGE
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.DIARY_TABLE_IDX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: diaryId
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DIARY_TABLE}
+
+    AttachmentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.ATTACHMENTS_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
+
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: MyPolicy
+          Version: '2012-10-17'
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*'
+              Action: 's3:GetObject'
+              Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENTS_S3_BUCKET}/*
+        Bucket:
+          Ref: AttachmentsBucket
